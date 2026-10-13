@@ -142,10 +142,9 @@ from [HOIGen-1M](https://huggingface.co/datasets/HOIGen/HOIGen-1M). Thank you!
 ```bibtex
 @inproceedings{regenhuman2026,
   title     = {ReGenHuman: Re-Generating Human Appearances for Realistic Full-Body Video Anonymization},
+  author    = {Adam Sun and Eshaan Barkataki and Arnold Milstein and Gordon Wetzstein and Ehsan Adeli},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   year      = {2026},
-  eprint    = {2606.14972},
-  archivePrefix = {arXiv},
   url       = {https://arxiv.org/abs/2606.14972},
 }
 ```
