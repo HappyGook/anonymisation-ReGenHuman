@@ -28,18 +28,31 @@ from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
 
 MODEL_ID = "Qwen/Qwen3-VL-8B-Instruct"
 
-SYSTEM_PROMPT = """You write detailed prompts for synthetic video generation.
+SYSTEM_PROMPT = """You write prompts for synthetic video generation.
 
 You are given a video. Describe the whole video as one continuous scene,
 including how it evolves over time.
 
-Write a single coherent prompt of approximately 120-180 words covering:
-- Environment, setting, and background.
-- Visible people, their approximate number, clothing, and positions.
-- What the people do over time: movements, interactions, entering or
-  leaving, changes of posture.
+Write a single coherent prompt of approximately 100-140 words covering:
+- Environment, setting, background, and what is visible outside windows.
 - Objects, furniture, and other scene elements.
-- Camera viewpoint, framing, camera motion, lighting, and visual appearance.
+- How many people are visible and where they are (standing, seated, left,
+  right, front, back), referred to only as "a person", "the person on the
+  left", "the passengers", and similar neutral terms.
+- What the people do over time: movements, gestures, interactions, entering
+  or leaving, changes of posture, objects they handle.
+- Camera viewpoint, framing, camera motion, lighting, and atmosphere.
+
+STRICT RULES about people:
+- Never describe how a person looks or what they wear: no clothing, uniforms,
+  colors worn, hair, facial hair, skin, age, gender, body build, glasses,
+  hats, jewelry, or other worn accessories.
+- Do not use role words that imply a look (conductor, officer, worker). Use
+  "person" or "passenger".
+- Do not use gendered words or pronouns (man, woman, he, she, his, her). Use
+  "person" and "they".
+- People's appearance is added by a separate system. You describe only their
+  number, position, and behavior.
 
 Be concrete and visually descriptive. Do not speculate about anything that
 cannot be established from the video. Write in present tense, as a direct
@@ -83,13 +96,17 @@ def shrink_video(video: Path, dst: Path, max_fps: float, max_frames: int,
 def build_messages(video_path: Path, style_reference: str) -> list[dict]:
     user_text = (
         "Describe this video as a detailed video-generation prompt. "
-        "Cover the whole duration and mention how the people and the scene "
-        "change over time. Do not invent unobservable details."
+        "Cover the whole duration and describe how the scene and the people's "
+        "actions change over time. Describe the setting, objects, camera and "
+        "what people do, but never what they look like or wear. "
+        "Do not invent unobservable details."
     )
     if style_reference:
         user_text += (
             "\n\nUse the following existing prompt as a STYLE REFERENCE for "
-            "the level of detail and writing style. Do not copy its scene "
+            "sentence structure and level of detail ONLY. It may describe "
+            "people's appearance or clothing: ignore all of that and never "
+            "reproduce any appearance details. Do not copy its scene "
             f"content:\n\n{style_reference}"
         )
     return [

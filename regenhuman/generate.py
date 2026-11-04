@@ -75,11 +75,18 @@ def generate_video(
 
     pipe = load_pipeline(lora_path, wan_dir=wan_dir)
 
+    prompt_suffix = ("Every person in the scene, regardless of position or activity, has the same" +
+                     "appearance: medium-length hair pulled back, "
+                     "blond with reddish highlights, "
+                     "a blue jacket and pants, a yellow shirt.")
+
+    full_prompt = f"{prompt} {prompt_suffix}".strip()
+
     video = chunked.generate(
         pipe=pipe,
         control_frames=overlay_frames,
         ref_img=ref_img,
-        prompt=prompt,
+        prompt=full_prompt,
         negative_prompt=config.NEGATIVE_PROMPT,
         seed=seed,
         chunk_size=chunk_size,
